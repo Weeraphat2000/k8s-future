@@ -1,0 +1,61 @@
+apiVersion: apps/v1 # apps/v1 คือเอาไว้สำหรับจัดการ Deployment, ReplicaSet
+# v1 คือเอาไว้สำหรับจัดการ Pod, Service, ConfigMap
+kind: Deployment # Deployment คือ ตัวจัดการ Pod
+metadata:
+  name: my-deployment # ชื่อของ Deployment
+  labels: # label สำหรับระบุ label ของ Deployment
+    app: my-app # เช่น app: my-app
+    cpu: 4core # เช่น cpu: 4core
+spec:
+  replicas: 3 # จำนวน Pod ที่ต้องการให้ทำงานพร้อมกัน
+  selector: # selector ใช้สำหรับระบุ Pod ที่อยู่ภายใต้ Deployment นี้
+    matchLabels:
+      app: my-app # เช่น app: my-app
+  template: # template ใช้สำหรับกำหนดรูปแบบของ Pod
+    metadata:
+      labels: # label ของ Pod ที่จะถูกสร้างขึ้นจาก Deployment
+        app: my-app # ตรง matchLabels จะต้องตรงกับตรงนี้ด้วย
+    spec:
+      containers:
+        - name: my-container # ชื่อของ container ที่ต้องการสร้าง
+          image: my-image:latest # ชื่อและ tag ของ image ที่จะใช้ (docker image)
+          ports:
+            - containerPort: 80 # พอร์ตที่ container จะเปิดให้บริการ
+
+# apiVersion: apps/v1 # apps/v1 คือเอาไว้สำหรับจัดการ Deployment, ReplicaSet
+# # v1 คือเอาไว้สำหรับจัดการ Pod, Service, ConfigMap
+# kind: Deployment # Deployment คือ ตัวจัดการ Pod
+# metadata:
+#   name: my-deployment # ชื่อของ Deployment
+#   labels: # label สำหรับระบุ label ของ Deployment
+#     app: my-app # เช่น app: my-app
+#     cpu: 4core # เช่น cpu: 4core
+# spec:
+#   replicas: 3 # จำนวน Pod ที่ต้องการให้ทำงานพร้อมกัน
+#   selector: # selector ใช้สำหรับระบุ Pod ที่อยู่ภายใต้ Deployment นี้
+#     matchLabels:
+#       app: nginx # เช่น app: my-app
+#   template: # template ใช้สำหรับกำหนดรูปแบบของ Pod
+#     metadata:
+#       labels: # label ของ Pod ที่จะถูกสร้างขึ้นจาก Deployment
+#         app: nginx # ตรง matchLabels จะต้องตรงกับตรงนี้ด้วย
+#     spec:
+#       containers:
+#         - name: nginx-container # ชื่อของ container ที่ต้องการสร้าง
+#           image: nginx:latest # ชื่อและ tag ของ image ที่จะใช้ (docker image)
+#           ports:
+#             - containerPort: 80 # พอร์ตที่ container จะเปิดให้บริการ
+
+# kubectl apply -f <file deployment.yml> คือ การใช้คำสั่ง kubectl เพื่อสร้างหรืออัปเดต Deployment ใน Kubernetes โดยใช้ไฟล์ deployment.yml เป็นข้อมูลในการกำหนดค่าต่างๆ
+# kubectl get deployments คือ การใช้คำสั่ง kubectl เพื่อดึงข้อมูลเกี่ยวกับ Deployment ที่มีอยู่ใน Kubernetes
+# kubectl get pods คือ การใช้คำสั่ง kubectl เพื่อดึงข้อมูลเกี่ยวกับ Pods ที่มีอยู่ใน Kubernetes
+# kubectl get replicasets คือ การใช้คำสั่ง kubectl เพื่อดึงข้อมูลเกี่ยวกับ ReplicaSets ที่มีอยู่ใน Kubernetes
+# kubectl describe pod <pod-name> คือ การใช้คำสั่ง kubectl เพื่อดึงข้อมูลรายละเอียดเกี่ยวกับ Pod ที่ระบุชื่อ
+# kubectl describe deployment <deployment-name> คือ การใช้คำสั่ง kubectl เพื่อดึงข้อมูลรายละเอียดเกี่ยวกับ Deployment ที่ระบุชื่อ
+# kubectl logs <pod-name> คือ การใช้คำสั่ง kubectl เพื่อดึงข้อมูล log ของ Pod ที่ระบุชื่อ
+# kubectl delete deployment <deployment-name> คือ การใช้คำสั่ง kubectl เพื่อลบ Deployment ที่ระบุชื่อ (ถ้าลบ deployment ไป replicaset, pod ก็จะถูกลบไปด้วย)
+# kubectl delete pod <pod-name> คือ การใช้คำสั่ง kubectl เพื่อลบ Pod ที่ระบุชื่อ (ถ้า Pod ถูกสร้างโดย ReplicaSet หรือ Deployment, Kubernetes จะสร้าง Pod ใหม่ขึ้นมาแทนที่)
+
+# kubectl get deployment -o wide คือ การใช้คำสั่ง kubectl เพื่อดึงข้อมูลเกี่ยวกับ Deployment ที่มีอยู่ใน Kubernetes พร้อมรายละเอียดเพิ่มเติม
+
+# kubectl exec -it <pod-name> -- sh คือ การใช้คำสั่ง kubectl เพื่อเข้าสู่ shell ของ Pod ที่ระบุชื่อ
