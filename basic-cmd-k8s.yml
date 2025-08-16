@@ -1,0 +1,80 @@
+# Cluster and context 
+# ใช้ตรวจสอบว่าเรากำลังคุยกับ cluster ไหน อยู่
+# cluster คือ กลุ่มของเครื่องคอมพิวเตอร์ที่ทำงานร่วมกันเพื่อให้บริการ Kubernetes
+# context คือ ชุดของการตั้งค่าที่ใช้ในการเชื่อมต่อกับ cluster
+kubectl version                   # ดูเวอร์ชัน client / server
+kubectl cluster-info              # ดูข้อมูล cluster ปัจจุบัน
+kubectl config get-contexts       # ดู context ที่มีอยู่
+kubectl config current-context    # ดู context ที่ใช้งานอยู่
+kubectl config use-context <context-name>   # สลับ context
+
+# Namespace
+# ใช้แบ่งพื้นที่ใน cluster ออกเป็นส่วน ๆ คล้ายโฟลเดอร์ ใช้ namespace เพื่อแยก resource ของแต่ละทีม/โปรเจค ไม่ให้ชนกัน
+# namespace คือ กลุ่มของทรัพยากรที่แยกออกจากกันใน cluster
+kubectl get namespaces            # ดู namespace ทั้งหมด
+kubectl create namespace dev      # สร้าง namespace ใหม่
+kubectl delete namespace dev      # ลบ namespace
+kubectl config set-context --current --namespace=dev   # เปลี่ยน namespace ที่ใช้เป็นค่า default
+
+# Pod
+# pod คือ หน่วยพื้นฐานของการทำงานใน Kubernetes
+kubectl get pods                    # ดู pod ทั้งหมด
+kubectl get po                      # ดู pod ทั้งหมด (ย่อ)
+kubectl get pods -n kube-system     # ดู pod ใน namespace อื่น
+kubectl describe pod <pod-name>     # ดูรายละเอียด pod
+kubectl logs <pod-name>             # ดู log ของ pod
+kubectl exec -it <pod-name> -- sh   # เข้าไปใน container (shell)
+kubectl delete pod <pod-name>       # ลบ pod (K8s จะสร้างใหม่ถ้ามี ReplicaSet/Deployment)
+
+# Deployment and ReplicaSet
+# ใช้สำหรับจัดการ หลาย Pod และ rollout อัพเดต version
+# deployment คือ ชุดของ pod ที่ทำงานร่วมกัน
+# ReplicaSet คือ กลุ่มของ pod ที่ทำงานร่วมกันและสามารถปรับขนาดได้
+kubectl get deployments                                 # ดู deployment
+kubectl describe deployment <deploy-name>               # ดูรายละเอียด
+kubectl apply -f deploy.yaml                            # apply config
+kubectl delete -f deploy.yaml                           # ลบ object จากไฟล์
+kubectl scale deployment <deploy-name> --replicas=3     # scale replicas
+kubectl rollout status deployment <deploy-name>         # ดูสถานะการ deploy เวอร์ชันใหม่
+kubectl rollout undo deployment <deploy-name>           # rollback กลับไป version ก่อนหน้า
+
+# Service / Networking
+# ใช้สำหรับ เปิดทางให้เข้าถึง Pod หรือสื่อสารกันระหว่าง Pod
+kubectl get services                                   # ดู service ทั้งหมด
+kubectl describe service <service-name>                # ดูรายละเอียด service
+kubectl expose deployment <deploy-name> --type=LoadBalancer --name=<service-name>   # สร้าง service จาก deployment
+kubectl delete service <service-name>                  # ลบ service
+
+# ConfigMap / Secret
+# ใช้เก็บค่า configuration และ password/credentials
+# ใช้เวลา Pod ต้องการ config เช่น DB_HOST, DB_USER, DB_PASSWORD
+kubectl get configmap                                         # ดู configmap
+kubectl create configmap my-config --from-literal=key=value   # สร้าง configmap
+kubectl get secret                                            # ดู secret
+kubectl create secret generic my-secret --from-literal=user=admin --from-literal=pwd=1234   # สร้าง secret
+
+# Node และ Resource
+# ใช้ตรวจสอบ cluster ว่ามี resource เท่าไร ใช้ไปเท่าไร
+kubectl get nodes                     # ดู nodes ใน cluster
+kubectl describe node <node-name>       # รายละเอียด node เช่น CPU, Memory
+kubectl top node                      # ใช้ resource ของ node (ต้องมี metrics-server)
+kubectl top pod                       # ใช้ resource ของ Pod
+
+# Debugging & Troubleshooting
+# ใช้ตามหาปัญหาเวลา Pod ไม่ Running
+kubectl get events --sort-by=.metadata.creationTimestamp  # ดู event ย้อนหลัง
+kubectl describe pod <pod-name>                           # ดูสาเหตุ Pod พัง (เช่น ImagePullBackOff, Evicted)
+kubectl logs <pod-name> -c <container-name>               # ดู log ของ container (ในกรณี pod มีหลาย container)
+kubectl exec -it <pod-name> -- bash                       # เข้าไปใน container เพื่อเช็คด้านใน
+
+
+
+
+
+docker system df             
+# TYPE            TOTAL     ACTIVE    SIZE      RECLAIMABLE
+# Images          18        17        4.343GB   597MB (13%)
+# Containers      44        18        452.4kB   452.2kB (99%)
+# Local Volumes   24        5         5.147GB   3.419GB (66%)
+# Build Cache     46        0         1.236MB   1.236MB
+# docker system df คือ คำสั่งที่ใช้ในการแสดงข้อมูลเกี่ยวกับการใช้พื้นที่ดิสก์ของ Docker
