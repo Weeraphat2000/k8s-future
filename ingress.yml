@@ -1,0 +1,52 @@
+# # Ingress
+# # คือ เอาทุก service มารวมกันให้มีทางเข้าทางเดียว คือ ถ้ามีคนภายนอกต้องการเข้าถึง service ต่างๆ ingress จะเป็นตัวกลางในการเข้าถึง service ต่างๆ
+# # ถ้าอยากไป service ไหนก็ไปตาม part นั้นๆ
+
+# # networking.k8s.io/v1 จะเป็นของ Ingress
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata: # ข้อมูลเมตาของ Ingress
+#   name: my-ingress
+# spec:
+#   rules:
+#     - host: my-app.example.com
+#       http:
+#         paths:
+#           - path: /
+#             pathType: Prefix
+#             backend:
+#               service:
+#                 name: my-service
+#                 port:
+#                   number: 80
+
+# kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.2.0/deploy/static/provider/cloud/deploy.yaml
+# kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.2.0/deploy/static/provider/baremetal/deploy.yaml
+# เพื่อลง ingress-nginx
+apiVersion: networking.k8s.io/v1 # kind: Ingress apiVersion จะเป็น networking.k8s.io/v1 เท่านั้น
+kind: Ingress
+metadata:
+  name: my-ingress # ตั้งชื่อให้ ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: / # กำหนดให้ rewrite path เป็น /
+# annotation ตัวนี้บอก NGINX Ingress Controller ว่า: เวลามี request ที่เข้า match กับ path ของ ingress → ให้ rewrite URL path ใหม่ก่อนส่งไปที่ backend service
+spec:
+  # ingressClassName คือ class ที่ใช้สำหรับ ingress นี้
+  ingressClassName: nginx # ingressClassName: nginx = ระบุว่า Ingress Rules นี้ ต้องใช้ NGINX Ingress Controller เป็นตัวทำงานให้
+  rules:
+    - http:
+        paths:
+          - path: /testpart # Prefix path สำหรับ service นี้ ถ้าจะเข้าถึง service นี้ต้องเข้ามาที่ prefix นี้เท่านั้น
+            pathType: Prefix
+            backend:
+              service:
+                name: my-service # Prefix part /testpart จะวิ่งเข้าไปหา service my-service port 80
+                port:
+                  number: 80 # port ของ service(port)
+
+# kubectl get ingress
+# kubectl get ing
+# เอาไว้สำหรับดู ingress ทั้งหมด
+
+# kubectl describe ingress <ingress-name>
+# เอาไว้สำหรับดูรายละเอียดของ ingress
