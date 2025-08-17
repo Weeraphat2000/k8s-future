@@ -1,3 +1,38 @@
+# Deployment
+# 	•	หน้าที่หลัก: จัดการ ReplicaSet และ Pod
+# 	•	เวลาเรา kubectl apply -f deployment.yaml → Kubernetes จะสร้าง ReplicaSet → ซึ่งไปสร้าง Pod ตามจำนวนที่กำหนด (replicas)
+# 	•	ถ้ามี Pod ตาย → ReplicaSet จะสร้างใหม่ให้ตามจำนวนที่กำหนด
+# 	•	เวลา scale up/down (kubectl scale หรือแก้ replicas ใน manifest) → Deployment จะสั่ง ReplicaSet ให้เพิ่ม/ลด Pod
+# 	•	เวลา rolling update → Deployment จะสร้าง Pod ใหม่และค่อย ๆ ลบ Pod เก่า
+
+# พูดง่าย ๆ: Deployment = ตัวควบคุม lifecycle ของ Pod (จำนวน, การ update, การ self-healing)
+# Deployment = จัดการจำนวน/การทำงานของ Pod
+
+# Example
+# apiVersion: apps/v1 # apps/v1 คือเอาไว้สำหรับจัดการ Deployment, ReplicaSet
+# # v1 คือเอาไว้สำหรับจัดการ Pod, Service, ConfigMap
+# kind: Deployment # Deployment คือ ตัวจัดการ Pod
+# metadata:
+#   name: my-deployment # ชื่อของ Deployment
+#   labels: # label สำหรับระบุ label ของ Deployment
+#     app: my-app # เช่น app: my-app
+#     cpu: 4core # เช่น cpu: 4core
+# spec:
+#   replicas: 3 # จำนวน Pod ที่ต้องการให้ทำงานพร้อมกัน
+#   selector: # selector ใช้สำหรับระบุ Pod ที่อยู่ภายใต้ Deployment นี้
+#     matchLabels: # label ที่ใช้สำหรับเลือก Pod ที่ต้องการให้ Deployment นี้จัดการ
+#       app: my-app # เช่น app: my-app
+#   template: # template ใช้สำหรับกำหนดรูปแบบของ Pod
+#     metadata:
+#       labels: # label ของ Pod ที่จะถูกสร้างขึ้นจาก Deployment
+#         app: my-app # ตรง matchLabels จะต้องตรงกับตรงนี้ด้วย
+#     spec:
+#       containers:
+#         - name: my-container # ชื่อของ container ที่ต้องการสร้าง
+#           image: my-image:latest # ชื่อและ tag ของ image ที่จะใช้ (docker image)
+#           ports:
+#             - containerPort: 80 # พอร์ตที่ container จะเปิดให้บริการ
+
 apiVersion: apps/v1 # apps/v1 คือเอาไว้สำหรับจัดการ Deployment, ReplicaSet
 # v1 คือเอาไว้สำหรับจัดการ Pod, Service, ConfigMap
 kind: Deployment # Deployment คือ ตัวจัดการ Pod
@@ -10,41 +45,17 @@ spec:
   replicas: 3 # จำนวน Pod ที่ต้องการให้ทำงานพร้อมกัน
   selector: # selector ใช้สำหรับระบุ Pod ที่อยู่ภายใต้ Deployment นี้
     matchLabels:
-      app: my-app # เช่น app: my-app
+      app: nginx # เช่น app: my-app
   template: # template ใช้สำหรับกำหนดรูปแบบของ Pod
     metadata:
       labels: # label ของ Pod ที่จะถูกสร้างขึ้นจาก Deployment
-        app: my-app # ตรง matchLabels จะต้องตรงกับตรงนี้ด้วย
+        app: nginx # ตรง matchLabels จะต้องตรงกับตรงนี้ด้วย
     spec:
       containers:
-        - name: my-container # ชื่อของ container ที่ต้องการสร้าง
-          image: my-image:latest # ชื่อและ tag ของ image ที่จะใช้ (docker image)
+        - name: nginx-container # ชื่อของ container ที่ต้องการสร้าง
+          image: nginx:latest # ชื่อและ tag ของ image ที่จะใช้ (docker image)
           ports:
             - containerPort: 80 # พอร์ตที่ container จะเปิดให้บริการ
-
-# apiVersion: apps/v1 # apps/v1 คือเอาไว้สำหรับจัดการ Deployment, ReplicaSet
-# # v1 คือเอาไว้สำหรับจัดการ Pod, Service, ConfigMap
-# kind: Deployment # Deployment คือ ตัวจัดการ Pod
-# metadata:
-#   name: my-deployment # ชื่อของ Deployment
-#   labels: # label สำหรับระบุ label ของ Deployment
-#     app: my-app # เช่น app: my-app
-#     cpu: 4core # เช่น cpu: 4core
-# spec:
-#   replicas: 3 # จำนวน Pod ที่ต้องการให้ทำงานพร้อมกัน
-#   selector: # selector ใช้สำหรับระบุ Pod ที่อยู่ภายใต้ Deployment นี้
-#     matchLabels:
-#       app: nginx # เช่น app: my-app
-#   template: # template ใช้สำหรับกำหนดรูปแบบของ Pod
-#     metadata:
-#       labels: # label ของ Pod ที่จะถูกสร้างขึ้นจาก Deployment
-#         app: nginx # ตรง matchLabels จะต้องตรงกับตรงนี้ด้วย
-#     spec:
-#       containers:
-#         - name: nginx-container # ชื่อของ container ที่ต้องการสร้าง
-#           image: nginx:latest # ชื่อและ tag ของ image ที่จะใช้ (docker image)
-#           ports:
-#             - containerPort: 80 # พอร์ตที่ container จะเปิดให้บริการ
 
 # kubectl apply -f <file deployment.yml> คือ การใช้คำสั่ง kubectl เพื่อสร้างหรืออัปเดต Deployment ใน Kubernetes โดยใช้ไฟล์ deployment.yml เป็นข้อมูลในการกำหนดค่าต่างๆ
 # kubectl get deployments คือ การใช้คำสั่ง kubectl เพื่อดึงข้อมูลเกี่ยวกับ Deployment ที่มีอยู่ใน Kubernetes
@@ -59,3 +70,5 @@ spec:
 # kubectl get deployment -o wide คือ การใช้คำสั่ง kubectl เพื่อดึงข้อมูลเกี่ยวกับ Deployment ที่มีอยู่ใน Kubernetes พร้อมรายละเอียดเพิ่มเติม
 
 # kubectl exec -it <pod-name> -- sh คือ การใช้คำสั่ง kubectl เพื่อเข้าสู่ shell ของ Pod ที่ระบุชื่อ
+
+# kubectl get po -l <name>=<value> คือ การใช้คำสั่ง kubectl เพื่อดึงข้อมูลเกี่ยวกับ Pods ที่มี label ตรงตามที่ระบุ

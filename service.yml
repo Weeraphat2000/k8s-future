@@ -1,0 +1,31 @@
+# Service
+# 	•	หน้าที่หลัก: เป็น stable endpoint เพื่อเข้าถึง Pod ได้แม้ Pod เปลี่ยนชื่อ/ถูก recreate
+# 	•	ภายใน cluster
+# 	•	ใช้ ClusterIP (ค่า default) → ให้ service ทำ load balancing กระจาย traffic ไปที่ Pod ที่อยู่เบื้องหลัง
+# 	•	จากภายนอก cluster
+# 	•	ใช้ NodePort → เปิด port บนทุก Node ของ cluster เพื่อให้เข้าถึงได้จากข้างนอก
+# 	•	หรือใช้ LoadBalancer (บน Cloud provider) → ให้ external load balancer ยิงเข้ามาที่ service ได้เลย
+
+# พูดง่าย ๆ: Service = ตัวควบคุมการเข้าถึง Pod (network, load balancing, stable DNS)
+# Service = จัดการวิธีเข้าถึง Pod (ทั้ง internal/external)
+
+# Service คือ ออบเจ็กต์ที่ใช้สำหรับกำหนดการเข้าถึง Pod ใน Kubernetes โดยสามารถเข้าถึงได้ผ่าน IP Address และ Port ที่กำหนด
+# ClusterIP คือ IP Address ที่ใช้ภายใน Cluster ของ Kubernetes โดยจะถูกกำหนดให้กับ Service ที่มี Type เป็น ClusterIP เท่านั้น
+# NodePort คือ พอร์ตที่ใช้สำหรับเข้าถึง Service จากภายนอก Cluster โดยจะถูกกำหนดให้กับ Service ที่มี Type เป็น NodePort เท่านั้น
+# LoadBalancer คือ Service ที่จะถูกสร้างขึ้นเพื่อให้สามารถเข้าถึงได้จากภายนอก Cluster โดยจะมีการสร้าง LoadBalancer ขึ้นมาใน Cloud Provider ที่ใช้งาน (ไปใช้ nodePort ดีกว่า)
+apiVersion: v1
+# apps/v1 คือเอาไว้สำหรับจัดการ Deployment, ReplicaSet
+# v1 คือเอาไว้สำหรับจัดการ Pod, Service, ConfigMap
+kind: Service
+metadata:
+  name: my-service # ตั้งชื่อของ Service
+spec:
+  type: NodePort # NodePort คือ พอร์ตที่ใช้สำหรับเข้าถึง Service จากภายนอก Cluster โดยจะถูกกำหนดให้กับ Service ที่มี Type เป็น NodePort เท่านั้น
+  # NodePort จะเป็นทั้ง NodePort และ ClusterIP
+  selector:
+    app: nginx # label ที่ใช้สำหรับเลือก Pod ที่ต้องการให้ Service นี้เข้าถึง
+  ports:
+    - protocol: TCP
+      port: 80 # port ตรงนี้คือ พอร์ตที่ใช้สำหรับ Service อื่นๆที่อยู่ภายใน Cluster(k8s) เข้าถึง service นี้ (เหมือน ClusterIP)
+      targetPort: 80 # คือ พอร์ตที่ใช้สำหรับเข้าถึง container ภายใน Pod
+      nodePort: 30000 # คือ พอร์ตที่ใช้สำหรับเข้าถึง Service นี้จากภายนอก Cluster
