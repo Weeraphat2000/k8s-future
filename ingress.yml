@@ -6,7 +6,7 @@
 # apiVersion: networking.k8s.io/v1
 # kind: Ingress
 # metadata: # ข้อมูลเมตาของ Ingress
-#   name: my-ingress
+#   name: <ingress-name ตั้งชื่ออะไรก็ได้>
 # spec:
 #   rules:
 #     - host: my-app.example.com
@@ -16,7 +16,7 @@
 #             pathType: Prefix
 #             backend:
 #               service:
-#                 name: my-service
+#                 name: <service-name>
 #                 port:
 #                   number: 80
 
@@ -40,6 +40,7 @@ spec:
             pathType: Prefix
             backend:
               service:
+                # ชื่อ service ตรงนี้ต้องตรงกับ ชื่อ service
                 name: my-service # Prefix part /testpart จะวิ่งเข้าไปหา service my-service port 80
                 port:
                   number: 80 # port ของ service(port)
@@ -50,3 +51,36 @@ spec:
 
 # kubectl describe ingress <ingress-name>
 # เอาไว้สำหรับดูรายละเอียดของ ingress
+
+#
+#
+#
+# kubectl get all -n ingress-nginx เอาไว้ดู resource ทั้งหมดใน namespace ingress-nginx
+# NAME                                            READY   STATUS      RESTARTS   AGE
+# pod/ingress-nginx-admission-create-dtfc6        0/1     Completed   0          76m
+# pod/ingress-nginx-admission-patch-w87qv         0/1     Completed   0          76m
+# pod/ingress-nginx-controller-6c9c57f77f-v5fmz   1/1     Running     0          76m
+
+# NAME                                         TYPE        CLUSTER-IP       EXTERNAL-IP   PORT(S)                      AGE
+# service/ingress-nginx-controller             NodePort    10.106.106.147   <none>        80:30810/TCP,443:32442/TCP   76m
+# service/ingress-nginx-controller-admission   ClusterIP   10.109.160.174   <none>        443/TCP                      76m
+
+# NAME                                       READY   UP-TO-DATE   AVAILABLE   AGE
+# deployment.apps/ingress-nginx-controller   1/1     1            1           76m
+
+# NAME                                                  DESIRED   CURRENT   READY   AGE
+# replicaset.apps/ingress-nginx-controller-6c9c57f77f   1         1         1       76m
+# replicaset.apps/ingress-nginx-controller-7b66b968cf   0         0         0       76m
+
+# NAME                                       STATUS     COMPLETIONS   DURATION   AGE
+# job.batch/ingress-nginx-admission-create   Complete   1/1           31s        76m
+# job.batch/ingress-nginx-admission-patch    Complete   1/1           31s        76m
+#
+#
+#
+#
+
+# http://localhost:30000/ เข้าผ่าน service nodePort
+# http://localhost:30810/testpart เข้าผ่าน ingress
+
+# kubectl get service -n ingress-nginx เพื่อดู service ที่ถูกสร้างขึ้นโดย ingress-nginx เข้าผ่าน ingress-nginx-controller             NodePort    10.106.106.147   <none>        80:30810/TCP,443:32442/TCP   69m

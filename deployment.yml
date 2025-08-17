@@ -47,7 +47,7 @@ spec:
     matchLabels:
       app: nginx # เช่น app: my-app
   template: # template ใช้สำหรับกำหนดรูปแบบของ Pod
-    metadata:
+    metadata: # label ที่ใช้สำหรับเลือก Pod ที่ต้องการให้ Deployment นี้จัดการ
       labels: # label ของ Pod ที่จะถูกสร้างขึ้นจาก Deployment
         app: nginx # ตรง matchLabels จะต้องตรงกับตรงนี้ด้วย
     spec:
