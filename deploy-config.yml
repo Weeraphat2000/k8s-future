@@ -1,0 +1,36 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: my-deployment-config
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+        - name: nginx-container
+          image: nginx:latest
+          ports:
+            - containerPort: 80
+          volumeMounts:
+            - name: nginx-conf # name volumeMounts กับ name volumes ต้องตรงกัน
+              mountPath: /etc/nginx # อยากเอา volume ไเก็บตรงไหนของ container
+              readOnly: true
+            - mountPath: /var/log/nginx
+              name: nginx-logs
+      volumes:
+        - name: nginx-conf # name volumeMounts กับ name volumes ต้องตรงกัน
+          configMap:
+            name: my-config # name ตรงงนี้ต้องเหมือนกับชื่อ metadata name ของ configmap ที่สร้างเอาไว้
+            items:
+              - key: nginx.conf # key ของไฟล์ที่ต้องการให้ mount
+                path: nginx.conf # ชื่อไฟล์ที่ต้องการให้ mount
+              - key: hun # key ของไฟล์ที่ต้องการให้ mount
+                path: hun # ชื่อไฟล์ที่ต้องการให้ mount
+        - name: nginx-logs
+          emptyDir: {}
