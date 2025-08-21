@@ -11,3 +11,9 @@
 # kubectl exec -it <pod-name> -- bash เพื่อเข้าไปที่ pod(container)
 
 # exit คือออกจาก container
+
+# curl -LO https://get.helm.sh/helm-v3.4.1-darwin-amd64.tar.gz ดาวห์โหลด helm จะได้เป็น file zip มา (helm-v3.4.1-darwin-amd64.tar.gz )
+
+# tar -xvf helm-v3.4.1-darwin-amd64.tar.gz เพื่อแตกไฟล์ zip เข้าไปให้เจอ file helm-v3.4.1-darwin-amd64.tar.gz ให้เจอ directory ก่อนนะ
+
+# helm install -f rb-values.yml reabbitmq bitnami/rabbitmq ลง service ของ rabbitmq => service, pod
