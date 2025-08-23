@@ -17,3 +17,17 @@
 # tar -xvf helm-v3.4.1-darwin-amd64.tar.gz เพื่อแตกไฟล์ zip เข้าไปให้เจอ file helm-v3.4.1-darwin-amd64.tar.gz ให้เจอ directory ก่อนนะ
 
 # helm install -f rb-values.yml reabbitmq bitnami/rabbitmq ลง service ของ rabbitmq => service, pod
+
+# Prometheus
+
+# helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
+
+# helm repo update
+
+# helm install prometheus prometheus-community/kube-prometheus-stack
+
+# kubectl edit service <service-name> เข้าไปแก้ service
+
+# kubectl edit service prometheus-kube-prometheus-prometheus
+
+แก้จาก clusterIp เป็น NodePort
