@@ -1,0 +1,33 @@
+apiVersion: apps/v1 # apps/v1 คือเอาไว้สำหรับจัดการ Deployment, ReplicaSet
+# v1 คือเอาไว้สำหรับจัดการ Pod, Service, ConfigMap
+kind: Deployment # Deployment คือ ตัวจัดการ Pod
+metadata:
+  name: workshop-dotnetcore-deployment # ชื่อของ Deployment
+  labels: # label สำหรับระบุ label ของ Deployment
+    app: workshop-dotnetcore
+spec:
+  replicas: 3 # จำนวน Pod ที่ต้องการให้ทำงานพร้อมกัน
+  selector: # selector ใช้สำหรับระบุ Pod ที่อยู่ภายใต้ Deployment นี้
+    matchLabels:
+      app: dotnetcore # เช่น app: my-app
+  template: # template ใช้สำหรับกำหนดรูปแบบของ Pod
+    metadata: # label ที่ใช้สำหรับเลือก Pod ที่ต้องการให้ Deployment นี้จัดการ
+      labels: # label ของ Pod ที่จะถูกสร้างขึ้นจาก Deployment
+        app: dotnetcore # ตรง matchLabels จะต้องตรงกับตรงนี้ด้วย
+    spec:
+      containers:
+        - name: dotnetcore-container # ชื่อของ container ที่ต้องการสร้าง
+          image: mcr.microsoft.com/dotnet/samples:aspnetapp # ชื่อและ tag ของ image ที่จะใช้ (docker image)
+          ports:
+            - containerPort: 80 # พอร์ตที่ container จะเปิดให้บริการ
+          volumeMounts:
+            - name: appsettings-volume # name volumeMounts กับ name volumes ต้องตรงกัน
+              mountPath: /app/appsettings.json
+              readOnly: true
+      volumes:
+        - name: appsettings-volume # name volumeMounts กับ name volumes ต้องตรงกัน
+          configMap:
+            name: appsettings-configmap # name ตรงงนี้ต้องเหมือนกับชื่อ metadata name ของ configmap ที่สร้างเอาไว้
+            items:
+              - key: appsettings.json # key ของไฟล์ที่ต้องการให้ mount
+                path: appsettings.json # ชื่อไฟล์ที่ต้องการให้ mount
